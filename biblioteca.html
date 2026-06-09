@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dramatiz — Biblioteca</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+.bib-page { padding:1.25rem 1.25rem 80px; }
+.bib-title { font-family:'Bebas Neue',sans-serif; font-size:2rem; letter-spacing:2px; margin-bottom:1.5rem; }
+.continue-card { position:relative; border-radius:10px; overflow:hidden; margin-bottom:8px; cursor:pointer; text-decoration:none; display:block; flex-shrink:0; width:200px; }
+.continue-card img { width:100%; aspect-ratio:16/9; object-fit:cover; display:block; }
+.continue-overlay { position:absolute; inset:0; background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,transparent 60%); }
+.continue-info { position:absolute; bottom:0; left:0; right:0; padding:0.75rem; }
+.continue-info .title { font-size:0.8rem; font-weight:700; }
+.continue-info .sub { font-size:0.7rem; color:rgba(255,255,255,0.65); }
+.continue-bar { height:3px; background:#333; border-radius: 8px; margin-top:5px; overflow:hidden; }
+.continue-bar-fill { height:100%; background:var(--yellow); border-radius: 8px; }
+.play-overlay { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:36px; height:36px; background:rgba(245,197,24,0.85); border-radius:50%; display:flex; align-items:center; justify-content:center; }
+.section-link-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+.section-link-row span { font-weight:700; font-size:0.95rem; }
+.section-link-row a { font-size:0.8rem; color:var(--yellow); text-decoration:none; }
+.poster-row { display:flex; gap:10px; overflow-x:auto; scrollbar-width:none; }
+.poster-row::-webkit-scrollbar { display:none; }
+.poster-item { width:90px; flex-shrink:0; }
+.poster-item img { width:100%; aspect-ratio:2/3; object-fit:cover; border-radius:8px; display:block; }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <div class="bib-page">
+    <h1 class="bib-title">Biblioteca</h1>
+
+    <div class="section-link-row"><span>Continue Assistindo</span></div>
+    <div class="scroll-x" id="continueRow" style="margin-bottom:1.5rem;"></div>
+
+    <div class="section-link-row">
+      <span>Downloads</span>
+      <a href="downloads.html">Ver tudo ›</a>
+    </div>
+    <div class="poster-row" id="downloadsRow" style="margin-bottom:1.5rem;"></div>
+
+    <div class="section-link-row">
+      <span>Assistir Depois</span>
+      <a href="#">Ver tudo ›</a>
+    </div>
+    <div class="poster-row" id="watchLaterRow"></div>
+  </div>
+  <nav class="bottom-nav">
+    <a href="home.html" class="nav-item ">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/>
+        <path d="M9 21V12h6v9"/>
+      </svg>
+    </a>
+    <a href="busca.html" class="nav-item ">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <circle cx="11" cy="11" r="7"/>
+        <path d="M21 21l-4.35-4.35"/>
+      </svg>
+    </a>
+    <a href="feed.html" class="nav-item ">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <circle cx="12" cy="12" r="9"/>
+        <path d="M12 8v4l2.5 2.5"/>
+      </svg>
+    </a>
+    <a href="biblioteca.html" class="nav-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <path d="M5 3a2 2 0 00-2 2v14a2 2 0 002 2h9l7-7V5a2 2 0 00-2-2H5z"/>
+        <path d="M16 3v7h7"/>
+      </svg>
+    </a>
+    <a href="perfil.html" class="nav-item ">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <circle cx="12" cy="8" r="4"/>
+        <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+      </svg>
+    </a>
+  </nav>
+</div>
+<script>
+const TMDB = '2dca580c2a14b55200e784d157207b4d';
+const IMG = 'https://image.tmdb.org/t/p/';
+const progresses = [35, 72, 58];
+
+fetch('https://api.themoviedb.org/3/movie/popular?api_key='+TMDB+'&language=pt-BR').then(r=>r.json()).then(d=>{
+  const movies = d.results;
+
+  // Continue assistindo
+  const cRow = document.getElementById('continueRow');
+  movies.slice(0,3).forEach((m,i) => {
+    if(!m.backdrop_path) return;
+    const a = document.createElement('a');
+    a.href = 'filme.html';
+    a.className = 'continue-card';
+    a.innerHTML = `
+      <img src="${IMG}w300${m.backdrop_path}" alt="${m.title}">
+      <div class="continue-overlay"></div>
+      <div class="play-overlay"><svg width="14" height="14" viewBox="0 0 24 24" fill="black"><path d="M5 3l14 9-14 9V3z"/></svg></div>
+      <div class="continue-info">
+        <div class="title">${m.title}</div>
+        <div class="sub">${Math.floor(m.runtime||90)} min restantes</div>
+        <div class="continue-bar"><div class="continue-bar-fill" style="width:${progresses[i]}%"></div></div>
+      </div>`;
+    cRow.appendChild(a);
+  });
+
+  // Downloads
+  const dRow = document.getElementById('downloadsRow');
+  movies.slice(3,7).forEach(m => {
+    if(!m.poster_path) return;
+    const div = document.createElement('div');
+    div.className = 'poster-item';
+    div.innerHTML = `<img src="${IMG}w185${m.poster_path}" alt="${m.title}">`;
+    dRow.appendChild(div);
+  });
+
+  // Assistir depois
+  const wRow = document.getElementById('watchLaterRow');
+  movies.slice(7,12).forEach(m => {
+    if(!m.poster_path) return;
+    const div = document.createElement('div');
+    div.className = 'poster-item';
+    div.innerHTML = `<img src="${IMG}w185${m.poster_path}" alt="${m.title}">`;
+    wRow.appendChild(div);
+  });
+});
+</script>
+</body>
+</html>

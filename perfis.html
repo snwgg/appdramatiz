@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dramatiz — Perfis</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+.perfis-page { min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2rem 1.75rem; }
+.perfis-title { font-family:'Bebas Neue',sans-serif; font-size:2rem; letter-spacing:2px; margin-bottom:2.5rem; text-align:center; }
+.perfis-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:1.5rem; width:100%; max-width:300px; margin-bottom:2.5rem; }
+.perfil-item { display:flex; flex-direction:column; align-items:center; gap:10px; cursor:pointer; text-decoration:none; }
+.perfil-avatar {
+  width:90px; height:90px; border-radius:50%; overflow:hidden;
+  border:3px solid transparent; transition:border-color 0.2s, transform 0.2s;
+  background: var(--dark2);
+}
+.perfil-item:hover .perfil-avatar { border-color:var(--yellow); transform:scale(1.05); }
+.perfil-avatar img { width:100%; height:100%; object-fit:cover; }
+.perfil-add {
+  width:90px; height:90px; border-radius:50%;
+  background:var(--dark2); border:2px dashed #444;
+  display:flex; align-items:center; justify-content:center;
+  font-size:2.2rem; color:var(--gray); transition:all 0.2s;
+}
+.perfil-item:hover .perfil-add { border-color:var(--yellow); color:var(--yellow); }
+.perfil-name { font-size:0.85rem; font-weight:600; color:var(--white); text-align:center; }
+.perfil-username { font-size:0.72rem; color:var(--gray); }
+.gerenciar { font-size:0.8rem; color:var(--gray); text-decoration:none; border:1px solid #333; border-radius:50px; padding:0.6rem 1.5rem; transition:all 0.2s; }
+.gerenciar:hover { border-color:var(--yellow); color:var(--yellow); }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <div class="perfis-page">
+    <h1 class="perfis-title fade-up fade-up-1">Quem está assistindo?</h1>
+    <div class="perfis-grid fade-up fade-up-2">
+      <a href="home.html" class="perfil-item">
+        <div class="perfil-avatar">
+          <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="PauloHVC">
+        </div>
+        <span class="perfil-name">PauloHVC</span>
+        <span class="perfil-username">paulo_hvc</span>
+      </a>
+      <a href="home.html" class="perfil-item">
+        <div class="perfil-avatar">
+          <img src="https://randomuser.me/api/portraits/men/44.jpg" alt="Dedé">
+        </div>
+        <span class="perfil-name">Dedé</span>
+        <span class="perfil-username">dede</span>
+      </a>
+      <a href="home.html" class="perfil-item">
+        <div class="perfil-avatar">
+          <img src="https://randomuser.me/api/portraits/men/55.jpg" alt="GG">
+        </div>
+        <span class="perfil-name">GG</span>
+        <span class="perfil-username">gg</span>
+      </a>
+      <a href="home.html" class="perfil-item">
+        <div class="perfil-avatar">
+          <img src="https://randomuser.me/api/portraits/men/68.jpg" alt="Dudu">
+        </div>
+        <span class="perfil-name">Dudu</span>
+        <span class="perfil-username">dudu</span>
+      </a>
+      <a href="#" class="perfil-item" style="grid-column:1/-1; justify-self:center;">
+        <div class="perfil-add">+</div>
+        <span class="perfil-name">Adicionar</span>
+      </a>
+    </div>
+    <a href="#" class="gerenciar fade-up fade-up-4">Gerenciar Perfis</a>
+  </div>
+</div>
+</body>
+</html>

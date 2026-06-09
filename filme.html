@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dramatiz — Filme</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+.filme-page { padding-bottom:80px; }
+.filme-hero { position:relative; aspect-ratio:4/3; overflow:hidden; background:#111; }
+.filme-hero img { width:100%; height:100%; object-fit:cover; }
+.filme-hero-overlay { position:absolute; inset:0; background:linear-gradient(to bottom,rgba(0,0,0,0.3) 0%, transparent 30%, rgba(10,10,10,0.8) 70%, var(--black) 100%); }
+.filme-back { position:absolute; top:1rem; left:1.25rem; z-index:2; color:white; }
+.filme-cast { position:absolute; top:1rem; right:1.25rem; z-index:2; color:white; }
+.filme-back svg, .filme-cast svg { width:24px; height:24px; }
+.filme-body { padding:0 1.25rem; }
+.filme-tags { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:0.5rem; }
+.filme-tag { font-size:0.72rem; color:var(--yellow); font-weight:600; }
+.filme-tag:not(:last-child)::after { content:'·'; margin-left:6px; color:var(--gray); }
+.filme-title { font-family:'Bebas Neue',sans-serif; font-size:2.4rem; letter-spacing:2px; line-height:1; margin-bottom:0.5rem; }
+.filme-meta { display:flex; align-items:center; gap:10px; margin-bottom:0.75rem; flex-wrap:wrap; }
+.rating-badge { font-size:0.7rem; font-weight:700; padding:3px 8px; border:1.5px solid #555; border-radius: 10px; color:var(--white); }
+.meta-text { font-size:0.8rem; color:var(--gray); }
+.meta-stars { color:var(--yellow); font-size:0.85rem; }
+.filme-desc { font-size:0.85rem; line-height:1.6; color:rgba(255,255,255,0.7); margin-bottom:1.25rem; }
+.filme-actions { display:flex; gap:10px; margin-bottom:1.25rem; }
+.action-btn-play {
+  flex:1; background:var(--yellow); color:var(--black);
+  border:none; border-radius:50px; padding:0.85rem;
+  font-family:'Barlow',sans-serif; font-weight:800; font-size:0.85rem;
+  letter-spacing:1.5px; text-transform:uppercase; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  text-decoration:none;
+}
+.action-icon {
+  width:44px; height:44px; border-radius:50%;
+  background:var(--dark2); border:1.5px solid #333;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:all 0.2s; color:var(--white);
+}
+.action-icon:hover { border-color:var(--yellow); color:var(--yellow); }
+.action-icon svg { width:18px; height:18px; }
+.filme-tabs { display:flex; border-bottom:1px solid #2a2a2a; margin-bottom:1.25rem; }
+.filme-tab { flex:1; text-align:center; padding:0.7rem; font-size:0.82rem; font-weight:600; color:var(--gray); cursor:pointer; border-bottom:2px solid transparent; transition:all 0.2s; }
+.filme-tab.active { color:var(--yellow); border-bottom-color:var(--yellow); }
+.sugestoes-row { display:flex; gap:10px; overflow-x:auto; scrollbar-width:none; }
+.sugestoes-row::-webkit-scrollbar { display:none; }
+.sug-item { width:120px; flex-shrink:0; cursor:pointer; text-decoration:none; display:block; }
+.sug-item img { width:100%; aspect-ratio:2/3; object-fit:cover; border-radius:8px; display:block; }
+.sug-name { font-size:0.72rem; color:rgba(255,255,255,0.7); margin-top:4px; text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.detalhes-section { font-size:0.85rem; line-height:1.8; color:rgba(255,255,255,0.7); }
+.detalhes-section strong { color:var(--white); font-weight:700; }
+.elenco-row { display:flex; gap:10px; overflow-x:auto; scrollbar-width:none; margin-top:1rem; }
+.elenco-row::-webkit-scrollbar { display:none; }
+.elenco-item { width:70px; flex-shrink:0; text-align:center; }
+.elenco-item img { width:60px; height:60px; border-radius:50%; object-fit:cover; display:block; margin:0 auto 5px; }
+.elenco-item span { font-size:0.68rem; color:rgba(255,255,255,0.7); display:block; }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <div class="filme-page">
+    <div class="filme-hero" id="filmeHero">
+      <a href="home.html" class="filme-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></a>
+      <a href="#" class="filme-cast"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="15" rx="2"/><path d="M16 3l-4 4-4-4"/></svg></a>
+      <div class="filme-hero-overlay"></div>
+    </div>
+
+    <div class="filme-body">
+      <div class="filme-tags" id="filmeTags"></div>
+      <h1 class="filme-title" id="filmeTitle">Carregando...</h1>
+      <div class="filme-meta">
+        <span class="rating-badge" id="filmeRating">14</span>
+        <span class="meta-text" id="filmeYear">2024</span>
+        <span class="meta-text">·</span>
+        <span class="meta-text" id="filmeRuntime">2h 10min</span>
+        <span class="meta-stars" id="filmeStars">★★★★☆</span>
+      </div>
+      <p class="filme-desc" id="filmeDesc"></p>
+
+      <div class="filme-actions">
+        <a href="#" class="action-btn-play" id="actionBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3l14 9-14 9V3z"/></svg>
+          Assistir
+        </a>
+        <button class="action-icon" title="Favoritar" onclick="this.style.color='var(--yellow)';this.style.borderColor='var(--yellow)'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </button>
+        <button class="action-icon" title="Adicionar à Lista" onclick="this.style.color='var(--yellow)';this.style.borderColor='var(--yellow)'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+        </button>
+        <button class="action-icon" title="Compartilhar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg>
+        </button>
+      </div>
+
+      <div class="filme-tabs">
+        <div class="filme-tab active" onclick="showTab('sugestoes',this)">Sugestões</div>
+        <div class="filme-tab" onclick="showTab('detalhes',this)">Detalhes</div>
+      </div>
+
+      <div id="tab-sugestoes">
+        <div class="sugestoes-row" id="sugestoesRow"></div>
+      </div>
+      <div id="tab-detalhes" style="display:none;">
+        <div class="detalhes-section" id="detalhesContent"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const TMDB = '2dca580c2a14b55200e784d157207b4d';
+const IMG = 'https://image.tmdb.org/t/p/';
+
+function showTab(tab, el) {
+  document.querySelectorAll('.filme-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-sugestoes').style.display = tab==='sugestoes'?'block':'none';
+  document.getElementById('tab-detalhes').style.display = tab==='detalhes'?'block':'none';
+}
+
+async function init() {
+  try {
+    const r = await fetch('https://api.themoviedb.org/3/movie/popular?api_key='+TMDB+'&language=pt-BR');
+    const d = await r.json();
+    const m = d.results[0];
+    if (!m) return;
+
+    // Hero
+    const hero = document.getElementById('filmeHero');
+    const img = document.createElement('img');
+    img.src = IMG + 'w780' + m.backdrop_path;
+    hero.insertBefore(img, hero.firstChild);
+
+    document.getElementById('filmeTitle').textContent = m.title;
+    document.getElementById('filmeDesc').textContent = m.overview || '';
+    document.getElementById('filmeYear').textContent = (m.release_date||'').split('-')[0];
+
+    const stars = Math.round((m.vote_average||7)/2);
+    document.getElementById('filmeStars').textContent = '★'.repeat(stars) + '☆'.repeat(5-stars);
+
+    const genreMap = {28:'Ação',12:'Aventura',16:'Animação',35:'Comédia',80:'Crime',18:'Drama',27:'Terror',878:'Ficção',53:'Suspense',10749:'Romance'};
+    const tags = document.getElementById('filmeTags');
+    (m.genre_ids||[]).slice(0,3).forEach(id => {
+      if(genreMap[id]) { const s=document.createElement('span'); s.className='filme-tag'; s.textContent=genreMap[id]; tags.appendChild(s); }
+    });
+
+    // Detalhes
+    document.getElementById('detalhesContent').innerHTML = `
+      <p><strong>Classificação</strong><br><span class="rating-badge" style="font-size:0.72rem">14</span> Violência</p>
+      <p style="margin-top:1rem;"><strong>Estreando</strong></p>
+      <div class="elenco-row" id="elencoRow"></div>`;
+
+    // Elenco fictício
+    const elencoRow = document.getElementById('elencoRow');
+    [12,33,44,47,68].forEach(id => {
+      elencoRow.innerHTML += `<div class="elenco-item"><img src="https://i.pravatar.cc/100?img=${id}"><span>Ator ${id}</span></div>`;
+    });
+
+    // Sugestões
+    const sugRow = document.getElementById('sugestoesRow');
+    d.results.slice(1,8).forEach(sug => {
+      if(!sug.poster_path) return;
+      const a = document.createElement('a');
+      a.href = 'filme.html';
+      a.className = 'sug-item';
+      a.innerHTML = `<img src="${IMG}w185${sug.poster_path}" alt="${sug.title}"><span class="sug-name">${sug.title}</span>`;
+      sugRow.appendChild(a);
+    });
+
+  } catch(e) { console.error(e); }
+}
+init();
+</script>
+  <nav class="bottom-nav">
+    <a href="home.html" class="nav-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>
+    </a>
+    <a href="busca.html" class="nav-item ">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+    </a>
+    <a href="feed.html" class="nav-item ">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l2.5 2.5"/></svg>
+    </a>
+    <a href="biblioteca.html" class="nav-item ">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 3a2 2 0 00-2 2v14a2 2 0 002 2h9l7-7V5a2 2 0 00-2-2H5z"/><path d="M16 3v7h7"/></svg>
+    </a>
+    <a href="perfil.html" class="nav-item ">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+    </a>
+  </nav>
+</body>
+</html>

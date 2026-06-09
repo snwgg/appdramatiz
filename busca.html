@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dramatiz — Buscar</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+.busca-page { padding:1.25rem 1.25rem 80px; }
+.busca-title { font-family:'Bebas Neue',sans-serif; font-size:2rem; letter-spacing:2px; margin-bottom:1rem; }
+.search-bar { position:relative; margin-bottom:1.25rem; }
+.search-bar svg { position:absolute; left:1rem; top:50%; transform:translateY(-50%); width:18px; height:18px; color:var(--gray); }
+.search-bar input { padding-left:2.75rem; }
+.tags-row { display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; padding-bottom:4px; margin-bottom:1.25rem; }
+.tags-row::-webkit-scrollbar { display:none; }
+.results-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+.results-grid a { text-decoration:none; display:block; border-radius:10px; overflow:hidden; }
+.results-grid img { width:100%; aspect-ratio:2/3; object-fit:cover; display:block; border-radius:10px; transition:transform 0.2s; }
+.results-grid a:hover img { transform:scale(1.04); }
+.result-title { font-size:0.7rem; color:rgba(255,255,255,0.7); margin-top:4px; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <div class="busca-page">
+    <h1 class="busca-title">Buscar</h1>
+    <div class="search-bar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input type="text" class="input-field" placeholder="Filmes, Séries e Mais" id="searchInput">
+    </div>
+    <div class="tags-row" id="tagsRow">
+      <span class="tag active" data-genre="">Todos</span>
+      <span class="tag" data-genre="28">Ação</span>
+      <span class="tag" data-genre="27">Terror</span>
+      <span class="tag" data-genre="35">Comédia</span>
+      <span class="tag" data-genre="16">Animes</span>
+      <span class="tag" data-genre="18">Drama</span>
+      <span class="tag" data-genre="878">Ficção</span>
+      <span class="tag" data-genre="10749">Romance</span>
+    </div>
+    <div class="results-grid" id="resultsGrid"></div>
+  </div>
+  <nav class="bottom-nav">
+    <a href="home.html" class="nav-item ">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/>
+        <path d="M9 21V12h6v9"/>
+      </svg>
+    </a>
+    <a href="busca.html" class="nav-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <circle cx="11" cy="11" r="7"/>
+        <path d="M21 21l-4.35-4.35"/>
+      </svg>
+    </a>
+    <a href="feed.html" class="nav-item ">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <circle cx="12" cy="12" r="9"/>
+        <path d="M12 8v4l2.5 2.5"/>
+      </svg>
+    </a>
+    <a href="biblioteca.html" class="nav-item ">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <path d="M5 3a2 2 0 00-2 2v14a2 2 0 002 2h9l7-7V5a2 2 0 00-2-2H5z"/>
+        <path d="M16 3v7h7"/>
+      </svg>
+    </a>
+    <a href="perfil.html" class="nav-item ">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <circle cx="12" cy="8" r="4"/>
+        <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+      </svg>
+    </a>
+  </nav>
+</div>
+<script>
+const TMDB = '2dca580c2a14b55200e784d157207b4d';
+const IMG = 'https://image.tmdb.org/t/p/w185';
+let activeGenre = '';
+let searchTimer;
+
+function renderMovies(movies) {
+  const grid = document.getElementById('resultsGrid');
+  grid.innerHTML = '';
+  movies.forEach(m => {
+    if (!m.poster_path) return;
+    const a = document.createElement('a');
+    a.href = 'filme.html';
+    const img = document.createElement('img');
+    img.src = IMG + m.poster_path;
+    img.alt = m.title || m.name;
+    img.loading = 'lazy';
+    const t = document.createElement('div');
+    t.className = 'result-title';
+    t.textContent = m.title || m.name;
+    a.append(img, t);
+    grid.appendChild(a);
+  });
+}
+
+async function load(genre='', query='') {
+  let url;
+  if (query) {
+    url = 'https://api.themoviedb.org/3/search/multi?api_key='+TMDB+'&language=pt-BR&query='+encodeURIComponent(query);
+  } else if (genre) {
+    url = 'https://api.themoviedb.org/3/discover/movie?api_key='+TMDB+'&language=pt-BR&with_genres='+genre+'&sort_by=popularity.desc';
+  } else {
+    url = 'https://api.themoviedb.org/3/movie/popular?api_key='+TMDB+'&language=pt-BR';
+  }
+  const r = await fetch(url);
+  const d = await r.json();
+  renderMovies(d.results || []);
+}
+
+document.querySelectorAll('#tagsRow .tag').forEach(tag => {
+  tag.addEventListener('click', () => {
+    document.querySelectorAll('#tagsRow .tag').forEach(t => t.classList.remove('active'));
+    tag.classList.add('active');
+    activeGenre = tag.dataset.genre;
+    load(activeGenre, document.getElementById('searchInput').value);
+  });
+});
+
+document.getElementById('searchInput').addEventListener('input', e => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => load(activeGenre, e.target.value), 400);
+});
+
+load();
+</script>
+</body>
+</html>
